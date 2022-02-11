@@ -1,7 +1,8 @@
 # DahuaVTO2MQTT
-Listens to events from all Dahua devices - VTO, Camera, NVR unit and publishes them via MQTT Message
+_Listens to events from all Dahua devices - VTO, Camera, NVR unit and publishes them via MQTT Message_
 
-[Dahua VTO MQTT Events - examples](https://github.com/elad-bar/DahuaVTO2MQTT/blob/master/MQTTEvents.MD)
+[Dahua VTO MQTT Events - examples](https://github.com/Hoellenwesen/DahuaVTO2MQTT/blob/main/MQTTEvents.md)
+[Supported Models](https://github.com/Hoellenwesen/DahuaVTO2MQTT/blob/main/SupportedModels.md)
 
 ## How to install
 ### Docker Compose
@@ -9,12 +10,13 @@ Listens to events from all Dahua devices - VTO, Camera, NVR unit and publishes t
 version: '2'
 services:
   dahuavto2mqtt:
-    image: "eladbar/dahuavto2mqtt:latest"
+    image: "ghcr.io/hoellenwesen/dahuavto2mqtt:latest"
     container_name: "dahuavto2mqtt"
     hostname: "dahuavto2mqtt"
     restart: always
     environment:
       - DAHUA_VTO_HOST=vto-host
+      - DAHUA_VTO_SSL=False
       - DAHUA_VTO_USERNAME=Username
       - DAHUA_VTO_PASSWORD=Password
       - MQTT_BROKER_HOST=mqtt-host
@@ -30,6 +32,7 @@ services:
 | Variable                 | Default       | Required | Description                |
 |--------------------------|---------------|----------|----------------------------|
 | DAHUA_VTO_HOST           | -             | +        | Dahua VTO hostname or IP   |
+| DAHUA_VTO_SSL            | False         | -        | Secure Connection to VTO   |
 | DAHUA_VTO_USERNAME       | -             | +        | Dahua VTO user name        |
 | DAHUA_VTO_PASSWORD       | -             | +        | Dahua VTO password         |
 | MQTT_BROKER_HOST         | -             | +        | MQTT Broker hostname or IP |
@@ -38,7 +41,7 @@ services:
 | MQTT_BROKER_PASSWORD     | -             | +        | MQTT Broker password       |
 | MQTT_BROKER_TOPIC_PREFIX | DahuaVTO      | -        | Topic to publish messages  |
 | MQTT_BROKER_CLIENT_ID    | DahuaVTO2MQTT | -        | MQTT Broker client ID      |
-| DEBUG                    | false         | -        | Enable debug log messages  |
+| DEBUG                    | False         | -        | Enable debug log messages  |
 
 
 ## Commands
@@ -122,7 +125,7 @@ If unit supports more than 1 door, please add to the payload `Door` parameter wi
 * 2021-05-27
   
   * Added Lock State status to prevent duplicate attempts of unlock (which led to error log message since the unit didn't allow that operation)
-  * Publish MQTT message with the lock status, more details in the [Dahua VTO MQTT Events - examples](https://github.com/elad-bar/DahuaVTO2MQTT/blob/master/MQTTEvents.MD) section
+  * Publish MQTT message with the lock status, more details in the [Dahua VTO MQTT Events - examples](https://github.com/Hoellenwesen/DahuaVTO2MQTT/blob/main/MQTTEvents.md) section
   * SSL support using new environment variable `DAHUA_VTO_SSL`
 
   
@@ -132,5 +135,8 @@ If unit supports more than 1 door, please add to the payload `Door` parameter wi
 
 
 ## Credits
-All credits goes to <a href="https://github.com/riogrande75">@riogrande75</a> who wrote that complicated integration
-Original code can be found in <a href="https://github.com/riogrande75/Dahua">@riogrande75/Dahua</a>
+- Forked from [elad-bar][source]
+- All credits goes to <a href="https://github.com/riogrande75">@riogrande75</a> who wrote that complicated integration
+- Original code can be found in <a href="https://github.com/riogrande75/Dahua">@riogrande75/Dahua</a>
+
+[source]: https://gitlab.com/elad.bar/DahuaVTO2MQTT
