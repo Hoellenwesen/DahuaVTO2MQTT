@@ -1,7 +1,6 @@
 .devcontainer
-.idea
 .vscode
-venv/
+.venv
 *.env
 *.yml
 *.pyc
