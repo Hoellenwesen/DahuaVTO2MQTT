@@ -2,6 +2,7 @@
 _Listens to events from all Dahua devices - VTO, Camera, NVR unit and publishes them via MQTT Message_
 
 [Dahua VTO MQTT Events - examples](https://github.com/Hoellenwesen/DahuaVTO2MQTT/blob/main/MQTTEvents.md)
+
 [Supported Models](https://github.com/Hoellenwesen/DahuaVTO2MQTT/blob/main/SupportedModels.md)
 
 ## How to install
@@ -52,6 +53,8 @@ If the payload of the message is empty, default door to open is 1,
 If unit supports more than 1 door, please add to the payload `Door` parameter with the number of the door 
 
 ## Changelog
+
+* 2022-Feb-11 - Suppress InsecureRequest warning
 
 * 2022-Jan-20 - MQTT Broker reconnect after 60 seconds
 
