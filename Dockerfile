@@ -7,7 +7,7 @@ COPY . ./
 
 RUN apk update && \
     apk upgrade && \
-    pip install paho-mqtt requests
+    pip install paho-mqtt==1.5.1 requests
 
 ENV DAHUA_VTO_HOST=vto-host
 ENV DAHUA_VTO_SSL=False
