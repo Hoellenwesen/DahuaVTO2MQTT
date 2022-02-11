@@ -1,4 +1,4 @@
-FROM python:3.9.7-alpine
+FROM python:3.9-alpine
 LABEL maintainer="Hoellenwesen"
 
 WORKDIR /app
@@ -7,7 +7,7 @@ COPY . ./
 
 RUN apk update && \
     apk upgrade && \
-    pip install paho-mqtt==1.5.1 requests
+    pip install paho-mqtt requests
 
 ENV DAHUA_VTO_HOST=vto-host
 ENV DAHUA_VTO_SSL=False
