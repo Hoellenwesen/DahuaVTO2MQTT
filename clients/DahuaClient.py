@@ -45,11 +45,12 @@ class DahuaClient(asyncio.Protocol):
         self.keep_alive_interval = 0
         self.transport = None
         self.hold_time = 0
+        self.base_url = self.dahua_config.base_url
         self.lock_status = {}
         self.data_handlers = {}
         self.mqtt_handlers = {
             TOPIC_DOOR: self.access_control_open_door,
-            TOPIC_MUTE: self.access_control_open_door
+            TOPIC_MUTE: self.run_cmd_mute
         }
 
         self._loop = asyncio.get_event_loop()
@@ -332,7 +333,11 @@ class DahuaClient(asyncio.Protocol):
         self.send(DAHUA_CONSOLE_RUN_CMD, handle_run_cmd_mute, request_data)
 
     def access_control_open_door(self, payload: dict):
-        door_id = payload.get("Door", 1)
+        door_id = None
+        if payload:
+            door_id = payload.get("Door")
+        else:
+            door_id = 1
 
         is_locked = self.lock_status.get(door_id, False)
         should_unlock = False

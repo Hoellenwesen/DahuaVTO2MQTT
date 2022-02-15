@@ -54,6 +54,8 @@ If unit supports more than 1 door, please add to the payload `Door` parameter wi
 
 ## Changelog
 
+* 2022-Feb-15 - Fixed some 'NoneType' and 'Attribute' errors
+
 * 2022-Feb-11 - Suppress InsecureRequest warning
 
 * 2022-Jan-20 - MQTT Broker reconnect after 60 seconds
