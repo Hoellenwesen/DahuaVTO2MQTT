@@ -24,9 +24,8 @@ class DahuaClient(asyncio.Protocol):
     keep_alive_interval: int
     realm: Optional[str]
     random: Optional[str]
-    mqtt_client: MQTTClient
+    mqtt_client: Optional[MQTTClient]
     dahua_details: Dict[str, Any]
-    base_url: str
     hold_time: int
     lock_status: Dict[int, bool]
     data_handlers: Dict[Any, Callable[[Any, str], None]]
@@ -34,8 +33,6 @@ class DahuaClient(asyncio.Protocol):
 
     def __init__(self):
         self.dahua_config = DahuaConfigurationData()
-        self.mqtt_client = MQTTClient(self, self.on_mqtt_message)
-
         self.dahua_details = {}
 
         self.realm = None
@@ -45,7 +42,6 @@ class DahuaClient(asyncio.Protocol):
         self.keep_alive_interval = 0
         self.transport = None
         self.hold_time = 0
-        self.base_url = self.dahua_config.base_url
         self.lock_status = {}
         self.data_handlers = {}
         self.mqtt_handlers = {
@@ -54,6 +50,7 @@ class DahuaClient(asyncio.Protocol):
         }
 
         self._loop = asyncio.get_event_loop()
+        self.mqtt_client = MQTTClient(self, self.on_mqtt_message)
 
     def connection_made(self, transport):
         _LOGGER.debug("Connection established")
@@ -62,6 +59,7 @@ class DahuaClient(asyncio.Protocol):
             self.transport = transport
 
             self.mqtt_client.initialize()
+
             self.pre_login()
 
         except Exception as ex:
@@ -97,6 +95,15 @@ class DahuaClient(asyncio.Protocol):
 
             _LOGGER.error(f"Failed to handle callback, error: {ex}, Line: {exc_tb.tb_lineno}")
 
+    @staticmethod
+    def on_mqtt_disconnected(self):
+        try:
+            self._loop.stop()
+        except Exception as ex:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+
+            _LOGGER.error(f"Failed to handle MQTT disconnected event, error: {ex}, Line: {exc_tb.tb_lineno}")
+
     def handle_notify_event_stream(self, params):
         try:
             event_list = params.get("eventList")
@@ -108,7 +115,8 @@ class DahuaClient(asyncio.Protocol):
                     if k in DAHUA_ALLOWED_DETAILS:
                         message[k] = self.dahua_details.get(k)
 
-                self.mqtt_client.publish(f"{code}/Event", message)
+                if self.mqtt_client.is_connected:
+                    self.mqtt_client.publish(f"{code}/Event", message)
 
         except Exception as ex:
             exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -333,11 +341,7 @@ class DahuaClient(asyncio.Protocol):
         self.send(DAHUA_CONSOLE_RUN_CMD, handle_run_cmd_mute, request_data)
 
     def access_control_open_door(self, payload: dict):
-        door_id = None
-        if payload:
-            door_id = payload.get("Door")
-        else:
-            door_id = 1
+        door_id = payload.get("Door", 1)
 
         is_locked = self.lock_status.get(door_id, False)
         should_unlock = False
@@ -353,7 +357,7 @@ class DahuaClient(asyncio.Protocol):
                 self.lock_status[door_id] = is_locked
                 self.publish_lock_state(door_id, False)
 
-                url = f"{self.base_url}{ENDPOINT_ACCESS_CONTROL}{door_id}"
+                url = f"{self.dahua_config.base_url}{ENDPOINT_ACCESS_CONTROL}{door_id}"
 
                 response = requests.get(url, verify=False, auth=self.dahua_config.auth)
 
@@ -382,7 +386,8 @@ class DahuaClient(asyncio.Protocol):
             "isLocked": is_locked
         }
 
-        self.mqtt_client.publish("/MagneticLock/Status", message)
+        if self.mqtt_client.is_connected:
+            self.mqtt_client.publish("/MagneticLock/Status", message)
 
     @staticmethod
     def parse_response(response):
