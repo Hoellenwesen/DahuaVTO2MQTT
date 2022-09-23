@@ -1,20 +1,20 @@
 # DahuaVTO2MQTT
-_Listens to events from all Dahua devices - VTO, Camera, NVR unit and publishes them via MQTT Message_
+Listens to events from all Dahua devices - VTO, Camera, NVR unit and publishes them via MQTT Message
+
+[Change log](https://gitlab.com/elad.bar/DahuaVTO2MQTT/-/blob/master/CHANGELOG.md)
 
 [Dahua VTO MQTT Events - examples](https://gitlab.com/elad.bar/DahuaVTO2MQTT/-/blob/master/MQTTEvents.MD)
-
-[Supported Models](https://gitlab.com/elad.bar/DahuaVTO2MQTT/-/blob/master/SupportedModels.md)
 
 ## How to install
 ### Docker Compose
 ```dockerfile
-version: '2'
+version: '3'
 services:
   dahuavto2mqtt:
     image: "ghcr.io/hoellenwesen/dahuavto2mqtt:latest"
     container_name: "dahuavto2mqtt"
     hostname: "dahuavto2mqtt"
-    restart: always
+    restart: "unless-stopped"
     environment:
       - DAHUA_VTO_HOST=vto-host
       - DAHUA_VTO_SSL=False
@@ -51,33 +51,6 @@ services:
 By publishing MQTT message of {MQTT_BROKER_TOPIC_PREFIX}/Command/Open an HTTP request to the unit will be sent,
 If the payload of the message is empty, default door to open is 1,
 If unit supports more than 1 door, please add to the payload `Door` parameter with the number of the door 
-
-## Changelog
-
-### 2022-May-19
-
-- Fix wrong call to function
-
-### 2022-May-17
-
-- Additional optimization to MQTT connection
-
-### 2022-May-15
-
-- MQTT Broker reconnect fix
-
-### 2022-Feb-16
-
-- Fix event handling
-
-### 2022-Jan-20
-
-- MQTT Broker reconnect after 60 seconds
-
-### 2022-Jan-07
-
-- Restructure code (2 clients - Dahua and MQTT)
-- Added support to mute call once ring using topic `DahuaVTO/Command/Mute`
 
 ## Credits
 - Forked from [elad-bar][source]
