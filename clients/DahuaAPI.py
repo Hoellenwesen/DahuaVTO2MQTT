@@ -391,7 +391,7 @@ class DahuaAPI(asyncio.Protocol):
         }
 
         self.outgoing_events.put(event_data)
-
+    
     @staticmethod
     def parse_response(response):
         result = None
@@ -411,7 +411,30 @@ class DahuaAPI(asyncio.Protocol):
             _LOGGER.error(f"Failed to read data: {response}, error: {e}, Line: {exc_tb.tb_lineno}")
 
         return result
+    
+    """
+    @staticmethod
+    def parse_response(response):
+        result = None
 
+        try:
+            response_parts = str(response).split("\\x00")
+            for response_part in response_parts:
+                if response_part.startswith("{"):
+                    if response_part[1]=='"':
+                        end = response_part.rindex("}") + 1
+                        message = response_part[0:end]
+                        message = message.replace("parse_response(response)","")
+                        print(message)
+                        result = json.loads(message)
+
+        except Exception as e:
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+
+            _LOGGER.error(f"Failed to read data: {response}, error: {e}, Line: {exc_tb.tb_lineno}")
+
+        return result
+    """
     @staticmethod
     def _get_hashed_password(random, realm, username, password):
         password_str = f"{username}:{realm}:{password}"

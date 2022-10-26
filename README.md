@@ -11,13 +11,12 @@ Listens to events from all Dahua devices - VTO, Camera, NVR unit and publishes t
 version: '3'
 services:
   dahuavto2mqtt:
-    image: "ghcr.io/hoellenwesen/dahuavto2mqtt:latest"
+    image: "registry.gitlab.com/elad.bar/dahuavto2mqtt:latest"
     container_name: "dahuavto2mqtt"
     hostname: "dahuavto2mqtt"
     restart: "unless-stopped"
     environment:
       - DAHUA_VTO_HOST=vto-host
-      - DAHUA_VTO_SSL=False
       - DAHUA_VTO_USERNAME=Username
       - DAHUA_VTO_PASSWORD=Password
       - MQTT_BROKER_HOST=mqtt-host
@@ -26,14 +25,13 @@ services:
       - MQTT_BROKER_PASSWORD=Password 
       - MQTT_BROKER_TOPIC_PREFIX=DahuaVTO
       - MQTT_BROKER_CLIENT_ID=DahuaVTO2MQTT
-      - DEBUG=False
+      - DEBUG=False      
 ```
 
 ### Environment Variables
 | Variable                 | Default       | Required | Description                |
 |--------------------------|---------------|----------|----------------------------|
 | DAHUA_VTO_HOST           | -             | +        | Dahua VTO hostname or IP   |
-| DAHUA_VTO_SSL            | False         | -        | Secure Connection to VTO   |
 | DAHUA_VTO_USERNAME       | -             | +        | Dahua VTO user name        |
 | DAHUA_VTO_PASSWORD       | -             | +        | Dahua VTO password         |
 | MQTT_BROKER_HOST         | -             | +        | MQTT Broker hostname or IP |
@@ -42,8 +40,7 @@ services:
 | MQTT_BROKER_PASSWORD     | -             | +        | MQTT Broker password       |
 | MQTT_BROKER_TOPIC_PREFIX | DahuaVTO      | -        | Topic to publish messages  |
 | MQTT_BROKER_CLIENT_ID    | DahuaVTO2MQTT | -        | MQTT Broker client ID      |
-| DEBUG                    | False         | -        | Enable debug log messages  |
-
+| DEBUG                    | false         | -        | Enable debug log messages  |
 
 ## Commands
 
@@ -53,8 +50,5 @@ If the payload of the message is empty, default door to open is 1,
 If unit supports more than 1 door, please add to the payload `Door` parameter with the number of the door 
 
 ## Credits
-- Forked from [elad-bar][source]
-- All credits goes to <a href="https://github.com/riogrande75">@riogrande75</a> who wrote that complicated integration
-- Original code can be found in <a href="https://github.com/riogrande75/Dahua">@riogrande75/Dahua</a>
-
-[source]: https://gitlab.com/elad.bar/DahuaVTO2MQTT
+All credits goes to <a href="https://github.com/riogrande75">@riogrande75</a> who wrote that complicated integration
+Original code can be found in <a href="https://github.com/riogrande75/Dahua">@riogrande75/Dahua</a>
