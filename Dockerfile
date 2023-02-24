@@ -1,5 +1,5 @@
 FROM python:3.10-alpine
-MAINTAINER Elad Bar <elad.bar@hotmail.com>
+LABEL maintainer="Hoellenwesen"
 
 WORKDIR /app
 
