@@ -1,8 +1,8 @@
-
 import asyncio
 import hashlib
 import json
 import logging
+import re
 import queue
 import struct
 import sys
@@ -85,7 +85,7 @@ class DahuaAPI(asyncio.Protocol):
             messages = self.parse_data(data)
 
             for message_data in messages:
-                message = self.parse_message(message_data)
+                message = self.parse_message(message_data, data)
 
                 if message is not None:
                     _LOGGER.debug(f"Handling message: {message}")
@@ -413,12 +413,21 @@ class DahuaAPI(asyncio.Protocol):
                 data_items.append(data_item)
 
         messages = data_items.decode("unicode-escape").split("\n")
-        _LOGGER.debug(f"Data cleaned up, Messages: {messages}")
 
-        return messages
+        result = []
+
+        for message in messages:
+            if message.startswith("DHIP"):
+                message = re.sub("DHIP[a-zA-Z]{[a-zA-Z]{1,2}{", "{{", message)
+
+            result.append(message)
+
+        _LOGGER.debug(f"Data cleaned up, Messages: {result}")
+
+        return result
 
     @staticmethod
-    def parse_message(message_data):
+    def parse_message(message_data, original_data):
         result = None
 
         try:
@@ -431,7 +440,12 @@ class DahuaAPI(asyncio.Protocol):
         except Exception as e:
             exc_type, exc_obj, exc_tb = sys.exc_info()
 
-            _LOGGER.error(f"Failed to read data: {message_data}, error: {e}, Line: {exc_tb.tb_lineno}")
+            _LOGGER.error(
+                f"Failed to read data: {message_data}, "
+                f"Original Data: {original_data}, "
+                f"Error: {e}, "
+                f"Line: {exc_tb.tb_lineno}"
+            )
 
         return result
 
