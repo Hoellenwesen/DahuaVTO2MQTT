@@ -2,10 +2,9 @@
 import os
 import sys
 import logging
-from time import sleep
 
-from clients.DahuaClient import DahuaClient
-from clients.MQTTClient import MQTTClient
+import clients.DahuaAPI as DahuaAPI
+from common.utils import parse_message, parse_data
 
 DEBUG = str(os.environ.get('DEBUG', False)).lower() == str(True).lower()
 
@@ -23,18 +22,17 @@ root.addHandler(stream_handler)
 _LOGGER = logging.getLogger(__name__)
 
 
-class DahuaVTOManager:
-    def __init__(self):
-        self._mqtt_client = MQTTClient()
-        self._dahua_client = DahuaClient()
-
-    def initialize(self):
-        self._mqtt_client.initialize(self._dahua_client.outgoing_events)
-        self._dahua_client.initialize(self._mqtt_client.outgoing_events)
-
-        while True:
-            sleep(1)
+data_items = [
+    
+]
 
 
-manager = DahuaVTOManager()
-manager.initialize()
+for data in data_items:
+    messages = parse_data(data)
+    print(f"Original: {messages}")
+
+    for message_data in messages:
+        message = parse_message(message_data.lstrip(), data)
+
+        print(message)
+
